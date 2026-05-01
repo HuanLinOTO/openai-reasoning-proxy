@@ -1,18 +1,54 @@
 # OpenAI Reasoning Proxy
 
-A small Rust proxy for OpenAI-compatible chat completion requests.
+一个用于 OpenAI 兼容 Chat Completion 请求的小型 Rust 代理。
 
-It accepts requests at `/{url}`, forwards the request to that raw absolute URL, and preserves method, query parameters, headers, and body. If the JSON body contains a `messages` array, every assistant message that is missing `reasoning_content` is patched to include an empty string before forwarding.
+它接受 `/{url}` 形式的请求，将请求转发到这个原始绝对 URL，并尽量透传 method、query、headers 和 body。如果 JSON body 中包含 `messages` 数组，代理会在转发前检查历史消息：所有缺少 `reasoning_content` 的 assistant 消息都会被补上空字符串。
 
-## Run
+## 运行
 
 ```powershell
 cargo run
 ```
 
-The server listens on `127.0.0.1:3000` by default. Set `PORT` to use another port.
+默认监听 `127.0.0.1:3000`。如果需要修改端口，设置 `PORT`：
 
-## Example
+```powershell
+$env:PORT="8080"
+cargo run
+```
+
+如果需要监听其他地址，设置 `HOST`：
+
+```powershell
+$env:HOST="0.0.0.0"
+$env:PORT="3000"
+cargo run
+```
+
+## Docker 部署
+
+使用已发布的 GHCR 镜像运行：
+
+```powershell
+docker run --rm -p 3000:3000 ghcr.io/huanlinoto/openai-reasoning-proxy:latest
+```
+
+容器内默认监听 `0.0.0.0:3000`。
+
+使用自定义端口：
+
+```powershell
+docker run --rm -p 8080:8080 -e PORT=8080 ghcr.io/huanlinoto/openai-reasoning-proxy:latest
+```
+
+本地构建并运行：
+
+```powershell
+docker build -t openai-reasoning-proxy:local .
+docker run --rm -p 3000:3000 openai-reasoning-proxy:local
+```
+
+## 请求示例
 
 ```powershell
 curl.exe -X POST "http://127.0.0.1:3000/https://api.openai.com/v1/chat/completions" `
@@ -21,14 +57,15 @@ curl.exe -X POST "http://127.0.0.1:3000/https://api.openai.com/v1/chat/completio
   -d '{"model":"gpt-4o-mini","messages":[{"role":"assistant","content":"hello"},{"role":"user","content":"continue"}]}'
 ```
 
-The forwarded body will contain:
+转发前的 body 会被补成类似这样：
 
 ```json
 {"role":"assistant","content":"hello","reasoning_content":""}
 ```
 
-## Notes
+## 说明
 
-- The upstream URL must use `http` or `https`.
-- Non-JSON bodies are forwarded unchanged.
-- Existing `reasoning_content` values are preserved.
+- 上游 URL 必须使用 `http` 或 `https`。
+- 非 JSON body 会原样转发。
+- 已存在的 `reasoning_content` 会保持不变。
+- raw URL 写在路径中，例如 `/https://api.openai.com/v1/chat/completions`。如果前面还有其他反向代理，确认它不会改写或截断路径中的 `https://`。
