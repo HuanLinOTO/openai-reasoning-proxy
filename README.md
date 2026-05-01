@@ -27,10 +27,10 @@ cargo run
 
 ## Docker 部署
 
-使用已发布的 GHCR 镜像运行：
+使用已发布的 GHCR 镜像后台运行：
 
 ```powershell
-docker run --rm -p 3000:3000 ghcr.io/huanlinoto/openai-reasoning-proxy:latest
+docker run -d --name openai-reasoning-proxy --restart unless-stopped -p 3000:3000 ghcr.io/huanlinoto/openai-reasoning-proxy:latest
 ```
 
 容器内默认监听 `0.0.0.0:3000`。
@@ -38,14 +38,27 @@ docker run --rm -p 3000:3000 ghcr.io/huanlinoto/openai-reasoning-proxy:latest
 使用自定义端口：
 
 ```powershell
-docker run --rm -p 8080:8080 -e PORT=8080 ghcr.io/huanlinoto/openai-reasoning-proxy:latest
+docker run -d --name openai-reasoning-proxy --restart unless-stopped -p 8080:8080 -e PORT=8080 ghcr.io/huanlinoto/openai-reasoning-proxy:latest
+```
+
+查看日志：
+
+```powershell
+docker logs -f openai-reasoning-proxy
+```
+
+停止并删除容器：
+
+```powershell
+docker stop openai-reasoning-proxy
+docker rm openai-reasoning-proxy
 ```
 
 本地构建并运行：
 
 ```powershell
 docker build -t openai-reasoning-proxy:local .
-docker run --rm -p 3000:3000 openai-reasoning-proxy:local
+docker run -d --name openai-reasoning-proxy --restart unless-stopped -p 3000:3000 openai-reasoning-proxy:local
 ```
 
 ## 请求示例
