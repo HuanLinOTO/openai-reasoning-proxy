@@ -82,3 +82,6 @@ curl.exe -X POST "http://127.0.0.1:3000/https://api.openai.com/v1/chat/completio
 - 非 JSON body 会原样转发。
 - 已存在的 `reasoning_content` 会保持不变。
 - raw URL 写在路径中，例如 `/https://api.openai.com/v1/chat/completions`。如果前面还有其他反向代理，确认它不会改写或截断路径中的 `https://`。
+
+## Credits
+ - linux.do
