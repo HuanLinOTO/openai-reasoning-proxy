@@ -35,6 +35,8 @@ docker run -d --name openai-reasoning-proxy --restart unless-stopped -p 3000:300
 
 容器内默认监听 `0.0.0.0:3000`。
 
+已发布镜像包含 `linux/amd64`、`linux/arm64` 和 `linux/arm/v7` 平台，Docker 会按运行环境自动拉取匹配架构。
+
 使用自定义端口：
 
 ```powershell
@@ -59,6 +61,12 @@ docker rm openai-reasoning-proxy
 ```powershell
 docker build -t openai-reasoning-proxy:local .
 docker run -d --name openai-reasoning-proxy --restart unless-stopped -p 3000:3000 openai-reasoning-proxy:local
+```
+
+本地多架构构建：
+
+```powershell
+docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t openai-reasoning-proxy:local .
 ```
 
 ## 请求示例
